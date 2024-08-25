@@ -1,0 +1,34 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+namespace Php\Pie;
+
+use Php\Pie\Command\BuildCommand;
+use Php\Pie\Command\DownloadCommand;
+use Php\Pie\Command\InfoCommand;
+use Php\Pie\Command\InstallCommand;
+use Php\Pie\Command\ShowCommand;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\CommandLoader\ContainerCommandLoader;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+
+/** @psalm-suppress UnresolvableInclude */
+include $_composer_autoload_path ?? __DIR__ . '/../vendor/autoload.php';
+
+$container = Container::factory();
+
+$application = new Application('pie', 'dev-main');
+$application->setCommandLoader(new ContainerCommandLoader(
+    $container,
+    [
+        'download' => DownloadCommand::class,
+        'build' => BuildCommand::class,
+        'install' => InstallCommand::class,
+        'info' => InfoCommand::class,
+        'show' => ShowCommand::class,
+    ]
+));
+$application->run($container->get(InputInterface::class), $container->get(OutputInterface::class));
